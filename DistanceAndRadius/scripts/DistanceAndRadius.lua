@@ -6,40 +6,37 @@ print('AppEngine Version: ' .. Engine.getVersion())
 local DELAY = 1000 -- ms between visualization steps for demonstration purpose
 
 -- Creating viewer
-local viewer = View.create("viewer2D1")
+local viewer = View.create()
 
 -- Setup graphical overlay attributes
-local regionDecoration = View.ShapeDecoration.create()
+local regionDecoration = View.ShapeDecoration.create():setLineWidth(4)
 regionDecoration:setLineColor(230, 230, 0) -- Yellow
-regionDecoration:setLineWidth(4)
 
-local featureDecoration = View.ShapeDecoration.create()
+local featureDecoration = View.ShapeDecoration.create():setLineWidth(4)
 featureDecoration:setLineColor(75, 75, 255) -- Blue
-featureDecoration:setLineWidth(4)
-featureDecoration:setPointType('DOT')
-featureDecoration:setPointSize(5)
+featureDecoration:setPointType('DOT'):setPointSize(5)
 
-local dotDecoration = View.ShapeDecoration.create()
-dotDecoration:setLineColor(230, 0, 0) -- Red
-dotDecoration:setPointType('DOT')
-dotDecoration:setPointSize(10)
+local dotDecoration = View.ShapeDecoration.create():setPointSize(10)
+dotDecoration:setPointType('DOT'):setLineColor(230, 0, 0) -- Red
 
 --End of Global Scope-----------------------------------------------------------
 
 --Start of Function and Event Scope---------------------------------------------
 
---@addText(x:int, y:int, txtString:string)
-local function addText(x, y, txtString, imageID)
+---@param x int
+---@param y int
+---@param txtString string
+local function addText(x, y, txtString)
   local deco = View.TextDecoration.create()
   deco:setSize(20)
   deco:setPosition(x, y)
-  viewer:addText(txtString, deco, nil, imageID)
+  viewer:addText(txtString, deco)
 end
 
 local function main()
   viewer:clear()
   local img = Image.load('resources/DistanceAndRadius.bmp')
-  local imageID = viewer:addImage(img)
+  viewer:addImage(img)
   viewer:present()
   Script.sleep(DELAY) -- for demonstration purpose only
 
@@ -54,17 +51,17 @@ local function main()
   local innerRadius = 10
   local foundCircle, _ = fitter:fitCircle(img, outerCircle, innerRadius)
 
-  viewer:addShape(outerCircle, regionDecoration, nil, imageID)
-  viewer:addShape(foundCircle, featureDecoration, nil, imageID)
-  viewer:addShape(foundCircle:getCenterOfGravity(), dotDecoration, nil, imageID)
+  viewer:addShape(outerCircle, regionDecoration)
+  viewer:addShape(foundCircle, featureDecoration)
+  viewer:addShape(foundCircle:getCenterOfGravity(), dotDecoration, nil)
 
   -- Fitting edge1 (left)
   local edgeCenter1 = Point.create(113, 260)
   local edgeRect1 = Shape.createRectangle(edgeCenter1, 40, 80, 0)
   local angle1 = 0
   local edge1segm, _ = fitter:fitLine(img, edgeRect1:toPixelRegion(img), angle1)
-  viewer:addShape(edge1segm, featureDecoration, nil, imageID)
-  viewer:addShape(edgeRect1, regionDecoration, nil, imageID)
+  viewer:addShape(edge1segm, featureDecoration)
+  viewer:addShape(edgeRect1, regionDecoration)
 
   -- Fitting edge2 (right)
   local edgeCenter2 = Point.create(515, 300)
@@ -72,8 +69,8 @@ local function main()
   local angle2 = math.pi -- pi rad = 180 deg
   local edge2segm, _ = fitter:fitLine(img, edgeRect2:toPixelRegion(img), angle2)
   local line2 = edge2segm:toLine()
-  viewer:addShape(edge2segm, featureDecoration, nil, imageID)
-  viewer:addShape(edgeRect2, regionDecoration, nil, imageID)
+  viewer:addShape(edge2segm, featureDecoration)
+  viewer:addShape(edgeRect2, regionDecoration)
 
   -- Fitting edge3 (bottom)
   local edgeCenter3 = Point.create(250, 396)
@@ -81,14 +78,14 @@ local function main()
   local angle3 = -math.pi / 2 --  -pi/2 rad = -90 deg
   local edge3segm,  _ = fitter:fitLine(img, edgeRect3:toPixelRegion(img), angle3)
   local line3 = edge3segm:toLine()
-  viewer:addShape(edge3segm, featureDecoration, nil, imageID)
-  viewer:addShape(edgeRect3, regionDecoration, nil, imageID)
+  viewer:addShape(edge3segm, featureDecoration)
+  viewer:addShape(edgeRect3, regionDecoration)
 
   -- Measuring radius
-  local radius = math.floor(foundCircle:getRadius() * 10) / 10
+  local _ ,radius = foundCircle:getCircleParameters()
   local posX = circleCenter:getX() + outerRadius + 10
   local posY = circleCenter:getY() - 13
-  addText(posX, posY, 'r = ' .. radius, imageID)
+  addText(posX, posY, 'r = ' .. radius)
 
   -- Measuring shortest edge-to-edge distance (orthogonal point-to-line)
   local midpoint = edge1segm:getCenterOfGravity()
@@ -96,15 +93,15 @@ local function main()
   local distance1 = math.floor(midpoint:getDistance(closestPoint1) * 10) / 10
   local distLine1 = Shape.createLineSegment(midpoint, closestPoint1)
 
-  viewer:addShape(distLine1, featureDecoration, nil, imageID)
-  addText(247, 225, 'd1 = ' .. distance1, imageID)
+  viewer:addShape(distLine1, featureDecoration)
+  addText(247, 225, 'd1 = ' .. distance1)
 
   -- Measuring shortest circle center to line distance (orthogonal point-to-line)
   local closestPoint2 = line3:getClosestContourPoint(circleCenter)
   local distance2 = math.floor(circleCenter:getDistance(closestPoint2) * 10) / 10
   local distLine2 = Shape.createLineSegment(circleCenter, closestPoint2)
-  viewer:addShape(distLine2, featureDecoration, nil, imageID)
-  addText(330, 350, 'd2 = ' .. distance2, imageID)
+  viewer:addShape(distLine2, featureDecoration)
+  addText(330, 350, 'd2 = ' .. distance2)
   viewer:present()
 
   print('d1 = ' .. distance1 .. ' d2 = ' .. distance2 .. ' r = ' .. radius)

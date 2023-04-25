@@ -1,7 +1,9 @@
 ## DistanceAndRadius
+
 Fitting two edges, measuring their shortest (orthogonal) distance and fitting a circle, measuring its radius and distance to a third edge.
 
 ### How to Run
+
 Starting this sample is possible either by running the App (F5) or
 debugging (F7+F10). Setting breakpoint on the first row inside the 'main'
 function allows debugging step-by-step after 'Engine.OnStarted' event.
@@ -12,7 +14,9 @@ required. For example SIM4000 with latest firmware. Alternatively the Emulator
 in AppStudio 2.3 or higher can be used.
 
 ### More Information
+
 Tutorial "Algorithms - Fitting and Measurement".
 
 ### Topics
-Algorithm, Image-2D, Fitting, Measurement, Sample, SICK-AppSpace
+
+algorithm, image-2d, fitting, measurement, sample, sick-appspace
